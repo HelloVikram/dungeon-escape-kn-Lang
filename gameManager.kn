@@ -1,0 +1,122 @@
+// Squad GameManager runs the main loop & commands
+
+Import Player;
+Import Room;
+
+Squad GameManager {
+  Quark rooms = {};
+  Quark player = new Player();
+
+  Doodle setupRooms() {
+    Quark entrance = new Room();
+    entrance.name = "Entrance Cell";
+    entrance.description = "A cold dark cell. A rusty_key lies on the floor.";
+    entrance.items.add("rusty_key");
+    entrance.exits = { "north": "Main Hall" };
+    rooms["Entrance Cell"] = entrance;
+
+    Quark hall = new Room();
+    hall.name = "Main Hall";
+    hall.description = "A large hall lit by torches.";
+    hall.items.add("torch");
+    hall.exits = { "south": "Entrance Cell", "west": "Guard Room", "east": "Locked Door" };
+    rooms["Main Hall"] = hall;
+
+    Quark guardRoom = new Room();
+    guardRoom.name = "Guard Room";
+    guardRoom.description = "A sleeping guard snores loudly.";
+    guardRoom.items.add("sword");
+    guardRoom.exits = { "east": "Main Hall" };
+    rooms["Guard Room"] = guardRoom;
+
+    Quark lockedDoor = new Room();
+    lockedDoor.name = "Locked Door";
+    lockedDoor.description = "An iron gate blocks your path.";
+    lockedDoor.locked = True;
+    lockedDoor.requiredItem = "rusty_key";
+    lockedDoor.exits = { "west": "Main Hall", "east": "Freedom" };
+    rooms["Locked Door"] = lockedDoor;
+
+    Quark freedom = new Room();
+    freedom.name = "Freedom";
+    freedom.description = "Fresh air hits your face. You escaped!";
+    rooms["Freedom"] = freedom;
+  }
+
+  Doodle startGame() {
+    Print(" Welcome to DUNGEON ESCAPE!");
+    Print("Commands: look, go <direction>, pick <item>, inventory, quit");
+
+    setupRooms();
+    player.currentRoom = rooms["Entrance Cell"];
+    rooms["Entrance Cell"].showDetails();
+
+    SpinCycle(player.isAlive) {
+      Quark command = Input(">> ");
+      handleCommand(command);
+    }
+  }
+
+  Doodle handleCommand(cmd) {
+    Quark parts = cmd.split(" ");
+    Quark action = parts[0];
+    Quark value = parts[1];
+
+    If (action == "look") {
+      rooms[player.currentRoom.name].showDetails();
+    }
+
+    Else If (action == "inventory") {
+      player.showInventory();
+    }
+
+    Else If (action == "pick") {
+      rooms[player.currentRoom.name].removeItem(value);
+      player.pickUp(value);
+    }
+
+    Else If (action == "go") {
+      Quark nextRoom = rooms[player.currentRoom.name].exits[value];
+      If (nextRoom == null) {
+        Print("You hit a wall. Smooth.");
+      } Else {
+        unlockLogic(nextRoom);
+      }
+    }
+
+    Else If (action == "quit") {
+      Print("You surrender. Dungeon wins.");
+      player.isAlive = False;
+    }
+
+    Else {
+      Print("Unknown command.");
+    }
+  }
+
+  Doodle unlockLogic(nextRoomName) {
+    Quark room = rooms[nextRoomName];
+
+    If (room.locked == True) {
+      If (player.hasItem(room.requiredItem)) {
+        Print("You used the rusty key to unlock the gate!");
+        room.locked = False;
+      } Else {
+        Print("The gate refuses to open. Maybe find a key?");
+        Return;
+      }
+    }
+
+    player.currentRoom = room;
+
+    If (room.name == "Freedom") {
+      Print("\n--- Freedom ---");
+      Print("Fresh air hits your face. You escaped!");
+      Print("🎉 You win! Game Complete!");
+      player.isAlive = False;
+      Return;
+    }
+
+    room.showDetails();
+  }
+}
