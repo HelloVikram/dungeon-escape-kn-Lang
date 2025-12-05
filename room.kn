@@ -1,0 +1,34 @@
+//Squad Room
+
+Squad Room {
+  Quark name;
+  Quark description;
+  Quark items = [];
+  Quark exits = {};
+  Quark locked = False;
+  Quark requiredItem = null;
+
+  // Doodle to show room information
+  Doodle showDetails() {
+    Print("\n--- " + name + " ---");
+    Print(description);
+
+    If (items.length > 0) {
+      Print("Items here: " + items.join(", "));
+    } Else {
+      Print("No items. Just regret.");
+    }
+
+    Quark directions = exits.keys();
+    If (directions.length > 0) {
+      Print("Exits: " + directions.join(", "));
+    } Else {
+      Print("No obvious exits. Panic intensifies.");
+    }
+  }
+
+  // Doodle to remove item from room
+  Doodle removeItem(itemName) {
+    items.remove(itemName);
+  }
+}
