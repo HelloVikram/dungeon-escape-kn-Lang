@@ -1,0 +1,28 @@
+//Squad Player
+
+Squad Player {
+  Quark name = "Unnamed Hero";
+  Quark currentRoom = null;
+  Quark inventory = [];
+  Quark isAlive = True;
+
+  // Doodle to add item to inventory
+  Doodle pickUp(itemName) {
+    inventory.add(itemName);
+    Print("You picked up the " + itemName + ". Confidence level +10.");
+  }
+
+  // Doodle to check if an item exists in inventory
+  Doodle hasItem(itemName) {
+    Return inventory.contains(itemName);
+  }
+
+  // Doodle to show inventory
+  Doodle showInventory() {
+    If (inventory.length == 0) {
+      Print("Your inventory is empty... just like your escape plan.");
+    } Else {
+      Print("You are carrying: " + inventory.join(", "));
+    }
+  }
+}
