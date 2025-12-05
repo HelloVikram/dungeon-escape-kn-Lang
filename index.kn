@@ -1,0 +1,6 @@
+//Entry point of the Game
+
+Import GameManager;
+
+Quark game = new GameManager();
+game.startGame();
